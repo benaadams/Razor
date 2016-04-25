@@ -14,8 +14,8 @@ namespace TestOutput
         private global::Microsoft.AspNetCore.Razor.Runtime.TagHelperRunner __tagHelperRunner = null;
         private global::Microsoft.AspNetCore.Razor.Runtime.TagHelperScopeManager __tagHelperScopeManager = null;
         private global::TestNamespace.PTagHelper __TestNamespace_PTagHelper = null;
-        private static readonly global::Microsoft.AspNetCore.Razor.TagHelpers.TagHelperAttribute __tagHelperAttribute_0 = new global::Microsoft.AspNetCore.Razor.TagHelpers.TagHelperAttribute("class", new global::Microsoft.AspNetCore.Html.HtmlEncodedString("Hello World"));
-        private static readonly global::Microsoft.AspNetCore.Razor.TagHelpers.TagHelperAttribute __tagHelperAttribute_1 = new global::Microsoft.AspNetCore.Razor.TagHelpers.TagHelperAttribute("data-delay", new global::Microsoft.AspNetCore.Html.HtmlEncodedString("1000"));
+        private static readonly global::Microsoft.AspNetCore.Razor.TagHelpers.TagHelperAttribute __tagHelperAttribute_0 = new global::Microsoft.AspNetCore.Razor.TagHelpers.TagHelperAttribute("class", new global::Microsoft.AspNetCore.Html.HtmlEncodedString("Hello World"), global::Microsoft.AspNetCore.Razor.TagHelpers.HtmlAttributeStructure.DoubleQuotedValue);
+        private static readonly global::Microsoft.AspNetCore.Razor.TagHelpers.TagHelperAttribute __tagHelperAttribute_1 = new global::Microsoft.AspNetCore.Razor.TagHelpers.TagHelperAttribute("data-delay", new global::Microsoft.AspNetCore.Html.HtmlEncodedString("1000"), global::Microsoft.AspNetCore.Razor.TagHelpers.HtmlAttributeStructure.DoubleQuotedValue);
         private global::TestNamespace.InputTagHelper __TestNamespace_InputTagHelper = null;
         private global::TestNamespace.InputTagHelper2 __TestNamespace_InputTagHelper2 = null;
         #line hidden
@@ -66,16 +66,16 @@ namespace TestOutput
 #line hidden
                 WriteLiteral(" + 1");
                 __tagHelperStringValueBuffer = EndTagHelperWritingScope();
-                __tagHelperExecutionContext.AddHtmlAttribute("data-interval", Html.Raw(__tagHelperStringValueBuffer.GetContent(HtmlEncoder)));
+                __tagHelperExecutionContext.AddHtmlAttribute("data-interval", Html.Raw(__tagHelperStringValueBuffer.GetContent(HtmlEncoder)), global::Microsoft.AspNetCore.Razor.TagHelpers.HtmlAttributeStructure.DoubleQuotedValue);
                 __TestNamespace_InputTagHelper.Type = "text";
-                __tagHelperExecutionContext.AddTagHelperAttribute("type", __TestNamespace_InputTagHelper.Type);
+                __tagHelperExecutionContext.AddTagHelperAttribute("type", __TestNamespace_InputTagHelper.Type, global::Microsoft.AspNetCore.Razor.TagHelpers.HtmlAttributeStructure.DoubleQuotedValue);
                 __TestNamespace_InputTagHelper2.Type = __TestNamespace_InputTagHelper.Type;
 #line 8 "NestedScriptTagTagHelpers.cshtml"
                                                           __TestNamespace_InputTagHelper2.Checked = true;
 
 #line default
 #line hidden
-                __tagHelperExecutionContext.AddTagHelperAttribute("checked", __TestNamespace_InputTagHelper2.Checked);
+                __tagHelperExecutionContext.AddTagHelperAttribute("checked", __TestNamespace_InputTagHelper2.Checked, global::Microsoft.AspNetCore.Razor.TagHelpers.HtmlAttributeStructure.DoubleQuotedValue);
                 await __tagHelperRunner.RunAsync(__tagHelperExecutionContext);
                 Instrumentation.BeginContext(307, 86, false);
                 Write(__tagHelperExecutionContext.Output);

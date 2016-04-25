@@ -32,7 +32,7 @@ namespace Microsoft.AspNetCore.Razor.Parser.TagHelpers.Internal
             return new TagHelperBlockBuilder(tagName, tagMode, start, attributes, descriptors);
         }
 
-        private static IList<KeyValuePair<string, SyntaxTreeNode>> GetTagAttributes(
+        private static IList<TagHelperAttributeNode> GetTagAttributes(
             string tagName,
             bool validStructure,
             Block tagBlock,
@@ -43,7 +43,7 @@ namespace Microsoft.AspNetCore.Razor.Parser.TagHelpers.Internal
             // contained TagHelperAttributeDescriptor's.
             descriptors = descriptors.Distinct(TypeBasedTagHelperDescriptorComparer.Default);
 
-            var attributes = new List<KeyValuePair<string, SyntaxTreeNode>>();
+            var attributes = new List<TagHelperAttributeNode>();
 
             // We skip the first child "<tagname" and take everything up to the ending portion of the tag ">" or "/>".
             // The -2 accounts for both the start and end tags. If the tag does not have a valid structure then there's
@@ -102,8 +102,12 @@ namespace Microsoft.AspNetCore.Razor.Parser.TagHelpers.Internal
                             result.AttributeName.Length);
                     }
 
-                    attributes.Add(
-                        new KeyValuePair<string, SyntaxTreeNode>(result.AttributeName, result.AttributeValueNode));
+                    var attributeNode = new TagHelperAttributeNode(
+                        result.AttributeName,
+                        result.AttributeValueNode,
+                        result.AttributeStructure);
+
+                    attributes.Add(attributeNode);
                 }
                 else
                 {
@@ -160,6 +164,7 @@ namespace Microsoft.AspNetCore.Razor.Parser.TagHelpers.Internal
             var htmlSymbols = span.Symbols.OfType<HtmlSymbol>().ToArray();
             var capturedAttributeValueStart = false;
             var attributeValueStartLocation = span.Start;
+            var attributeStructure = HtmlAttributeStructure.UnquotedValue;
 
             // The symbolOffset is initialized to 0 to expect worst case: "class=". If a quote is found later on for
             // the attribute value the symbolOffset is adjusted accordingly.
@@ -229,6 +234,15 @@ namespace Microsoft.AspNetCore.Razor.Parser.TagHelpers.Internal
                     // Check for attribute start values, aka single or double quote
                     if (i < htmlSymbols.Length && IsQuote(htmlSymbols[i]))
                     {
+                        if (htmlSymbols[i].Type == HtmlSymbolType.DoubleQuote)
+                        {
+                            attributeStructure = HtmlAttributeStructure.DoubleQuotedValue;
+                        }
+                        else
+                        {
+                            attributeStructure = HtmlAttributeStructure.SingleQuotedValue;
+                        }
+
                         symbolStartLocation = htmlSymbols[i].Start;
 
                         // If there's a start quote then there must be an end quote to be valid, skip it.
@@ -290,8 +304,13 @@ namespace Microsoft.AspNetCore.Razor.Parser.TagHelpers.Internal
             {
                 attributeValue = CreateMarkupAttribute(builder, result.IsBoundNonStringAttribute);
             }
+            else
+            {
+                attributeStructure = HtmlAttributeStructure.Minimized;
+            }
 
             result.AttributeValueNode = attributeValue;
+            result.AttributeStructure = attributeStructure;
             return result;
         }
 
@@ -347,8 +366,30 @@ namespace Microsoft.AspNetCore.Razor.Parser.TagHelpers.Internal
             // Have a name now. Able to determine correct isBoundNonStringAttribute value.
             var result = CreateTryParseResult(name, descriptors);
 
+            var firstChild = builder.Children[0] as Span;
+            if (firstChild != null && firstChild.Symbols[0] is HtmlSymbol)
+            {
+                var htmlSymbol = firstChild.Symbols[firstChild.Symbols.Count - 1] as HtmlSymbol;
+                switch (htmlSymbol.Type)
+                {
+                    case HtmlSymbolType.DoubleQuote:
+                        result.AttributeStructure = HtmlAttributeStructure.DoubleQuotedValue;
+                        break;
+                    case HtmlSymbolType.SingleQuote:
+                        result.AttributeStructure = HtmlAttributeStructure.SingleQuotedValue;
+                        break;
+                    case HtmlSymbolType.Equals:
+                        result.AttributeStructure = HtmlAttributeStructure.UnquotedValue;
+                        break;
+                    default:
+                        result.AttributeStructure = HtmlAttributeStructure.Minimized;
+                        break;
+                }
+            }
+
             // Remove first child i.e. foo="
             builder.Children.RemoveAt(0);
+
 
             // Grabbing last child to check if the attribute value is quoted.
             var endNode = block.Children.Last();
@@ -663,6 +704,8 @@ namespace Microsoft.AspNetCore.Razor.Parser.TagHelpers.Internal
             public string AttributeName { get; set; }
 
             public SyntaxTreeNode AttributeValueNode { get; set; }
+
+            public HtmlAttributeStructure AttributeStructure { get; set; }
 
             public bool IsBoundAttribute { get; set; }
 

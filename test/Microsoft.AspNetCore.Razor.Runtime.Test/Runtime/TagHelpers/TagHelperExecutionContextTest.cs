@@ -71,7 +71,7 @@ namespace Microsoft.AspNetCore.Razor.Runtime.TagHelpers
                 updatedCallCount++;
                 return Task.FromResult(true);
             };
-            executionContext.AddMinimizedHtmlAttribute("something");
+            executionContext.AddHtmlAttribute(new TagHelperAttribute("something"));
 
             // Act - 1
             executionContext.Reinitialize(
@@ -80,7 +80,7 @@ namespace Microsoft.AspNetCore.Razor.Runtime.TagHelpers
                 items: new Dictionary<object, object>(),
                 uniqueId: string.Empty,
                 executeChildContentAsync: updatedExecuteChildContentAsync);
-            executionContext.AddMinimizedHtmlAttribute("Another attribute");
+            executionContext.AddHtmlAttribute(new TagHelperAttribute("Another attribute"));
 
             // Assert - 1
             var output = executionContext.Output;
@@ -123,7 +123,7 @@ namespace Microsoft.AspNetCore.Razor.Runtime.TagHelpers
                 endWritingScope);
             var updatedItems = new Dictionary<object, object>();
             var updatedUniqueId = "another unique id";
-            executionContext.AddMinimizedHtmlAttribute("something");
+            executionContext.AddHtmlAttribute(new TagHelperAttribute("something"));
 
             // Act
             executionContext.Reinitialize(
@@ -132,7 +132,7 @@ namespace Microsoft.AspNetCore.Razor.Runtime.TagHelpers
                 updatedItems,
                 updatedUniqueId,
                 executeChildContentAsync);
-            executionContext.AddMinimizedHtmlAttribute("Another attribute");
+            executionContext.AddHtmlAttribute(new TagHelperAttribute("Another attribute"));
 
             // Assert
             var context = executionContext.Context;
@@ -413,8 +413,8 @@ namespace Microsoft.AspNetCore.Razor.Runtime.TagHelpers
             };
 
             // Act
-            executionContext.AddHtmlAttribute("class", "btn");
-            executionContext.AddHtmlAttribute("foo", "bar");
+            executionContext.AddHtmlAttribute("class", "btn", HtmlAttributeStructure.DoubleQuotedValue);
+            executionContext.AddHtmlAttribute("foo", "bar", HtmlAttributeStructure.DoubleQuotedValue);
             var output = executionContext.Output;
 
             // Assert
@@ -425,7 +425,7 @@ namespace Microsoft.AspNetCore.Razor.Runtime.TagHelpers
         }
 
         [Fact]
-        public void AddMinimizedHtmlAttribute_MaintainsHtmlAttributes()
+        public void AddHtmlAttribute_MaintainsMinimizedHtmlAttributes()
         {
             // Arrange
             var executionContext = new TagHelperExecutionContext("input", tagMode: TagMode.StartTagOnly);
@@ -436,8 +436,8 @@ namespace Microsoft.AspNetCore.Razor.Runtime.TagHelpers
             };
 
             // Act
-            executionContext.AddMinimizedHtmlAttribute("checked");
-            executionContext.AddMinimizedHtmlAttribute("visible");
+            executionContext.AddHtmlAttribute(new TagHelperAttribute("checked"));
+            executionContext.AddHtmlAttribute(new TagHelperAttribute("visible"));
             var output = executionContext.Output;
 
             // Assert
@@ -448,7 +448,7 @@ namespace Microsoft.AspNetCore.Razor.Runtime.TagHelpers
         }
 
         [Fact]
-        public void AddMinimizedHtmlAttribute_MaintainsHtmlAttributes_SomeMinimized()
+        public void AddHtmlAttribute_MaintainsHtmlAttributes_SomeMinimized()
         {
             // Arrange
             var executionContext = new TagHelperExecutionContext("input", tagMode: TagMode.SelfClosing);
@@ -461,10 +461,10 @@ namespace Microsoft.AspNetCore.Razor.Runtime.TagHelpers
             expectedAttributes.Add(new TagHelperAttribute(name: "visible"));
 
             // Act
-            executionContext.AddHtmlAttribute("class", "btn");
-            executionContext.AddHtmlAttribute("foo", "bar");
-            executionContext.AddMinimizedHtmlAttribute("checked");
-            executionContext.AddMinimizedHtmlAttribute("visible");
+            executionContext.AddHtmlAttribute("class", "btn", HtmlAttributeStructure.DoubleQuotedValue);
+            executionContext.AddHtmlAttribute("foo", "bar", HtmlAttributeStructure.DoubleQuotedValue);
+            executionContext.AddHtmlAttribute(new TagHelperAttribute("checked"));
+            executionContext.AddHtmlAttribute(new TagHelperAttribute("visible"));
             var output = executionContext.Output;
 
             // Assert
@@ -487,9 +487,9 @@ namespace Microsoft.AspNetCore.Razor.Runtime.TagHelpers
             };
 
             // Act
-            executionContext.AddHtmlAttribute("class", "btn");
-            executionContext.AddTagHelperAttribute("something", true);
-            executionContext.AddHtmlAttribute("foo", "bar");
+            executionContext.AddHtmlAttribute("class", "btn", HtmlAttributeStructure.DoubleQuotedValue);
+            executionContext.AddTagHelperAttribute("something", true, HtmlAttributeStructure.DoubleQuotedValue);
+            executionContext.AddHtmlAttribute("foo", "bar", HtmlAttributeStructure.DoubleQuotedValue);
             var context = executionContext.Context;
 
             // Assert
